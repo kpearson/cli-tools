@@ -1,0 +1,83 @@
+#!/bin/bash
+
+TEAMCITY_URL="http://production-teamcity-7.internal.noovie.com:8111/"
+FOOD_TRUCKS="https://streetfoodfinder.com/C3Culver"
+MAIL_RULES="https://outlook.office365.com/mail/options/mail/rules"
+JIRA="https://ncmdev.atlassian.net/secure/BrowseProjects.jspa"
+TIMESHEET="https://ncm.operations.dynamics.com/?cmp=llc&mi=TSTimesheetEntryGridViewMyTimesheets"
+GISTS="https://gist.github.com/kpearson/d4e6835aba12ec9c8681739c012d60df#ncm-resources"
+INSIDER="https://nationalcinemedia.sharepoint.com/"
+FILE_REPO="https://ncmdev.atlassian.net/wiki/spaces/TechOps/pages/758841426/Office365%2BGroups%2B-%2BFile%2BRepository"
+
+teamcity () {
+  osascript -e 'tell application "Viscosity" to connect "ncm production"'
+  osascript -e 'display notification "Connecting to NCM VPN with Viscosity \
+    Look for Duo Mobile auth request" with title "NCM CLI"'
+  sleep 10
+  open "$TEAMCITY_URL"
+}
+
+PARAMS=""
+while (( "$#" )); do
+  case "$1" in
+    -f|--flag-with-argument)
+      FARG=$2
+      shift 2
+      ;;
+    --)
+      shift
+      break
+      ;;
+    -*|--*=)
+      echo "Error: Unsupported flag $1" >&2
+      exit 1
+      ;;
+    *)
+      PARAMS="$PARAMS $1"
+      shift
+      ;;
+  esac
+done
+eval set -- "$PARAMS"
+
+if [ "$PARAMS" ]; then
+  case "$1" in
+    team | teamcity)
+      teamcity
+      exit 0
+      ;;
+    food | foodtruck)
+      open "$FOOD_TRUCKS"
+      exit 0
+      ;;
+    rules | emailrules)
+      open "$MAIL_RULES"
+      exit 0
+      ;;
+    jira)
+      open "$JIRA"
+      exit 0
+      ;;
+    time | timesheet | timesheets)
+      open "$TIMESHEET"
+      exit 0
+      ;;
+    gist)
+      open "$GISTS"
+      exit 0
+      ;;
+    insider)
+      open "$INSIDER"
+      exit 0
+      ;;
+    file | fileshare)
+      open "$FILE_REPO"
+      exit 0
+      ;;
+    *)
+      echo "Error: command not found $1"
+      exit 1
+      ;;
+  esac
+fi
+
