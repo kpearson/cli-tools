@@ -17,6 +17,7 @@ teamcity () {
   open "$TEAMCITY_URL"
 }
 
+
 PARAMS=""
 while (( "$#" )); do
   case "$1" in
@@ -72,6 +73,14 @@ if [ "$PARAMS" ]; then
       ;;
     file | fileshare)
       open "$FILE_REPO"
+      exit 0
+      ;;
+    ssh)
+      ssh kpearson@dev1-server-4.internal.noovie.com
+      exit 0
+      ;;
+    gwi-logs)
+      ./gwi-logs
       exit 0
       ;;
     *)

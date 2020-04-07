@@ -1,0 +1,25 @@
+#!/bin/bash
+
+LOG_FILE=/opt/gowatchit/watchit/shared/log/production.log
+PRODUCTION_SERVER_2=production-watchit-$box
+PRODUCTION_SERVER_3=production-watchit-$box.internal.noovie.com
+PRODUCTION_SERVER_4=production-watchit-$box.internal.noovie.com
+USER=kpearson
+
+#  multitail -l "ssh $USER@${PRODUCTION_SERVER_2} tail -f ${LOG_FILE}" \
+#    -l "ssh $USER@${PRODUCTION_SERVER_3} tail -f ${LOG_FILE}" \
+#    -l "ssh $USER@${PRODUCTION_SERVER_4} tail -f ${LOG_FILE}"
+mkdir -p /tmp/log
+
+pids=""
+pids="$pids $!"
+for box in 2 3 4; do
+  ssh -f $USER@production-watchit-${box}.internal.noovie.com "tail -f ${LOG_FILE}" > /tmp/log/prod_log_$box.log
+  pids="$pids $!"
+done
+
+lnav -t /tmp/log
+
+trap 'kill -9 $pids && rm -rf /tmp/log' SIGINT
+trap  wait
+
